@@ -20,8 +20,8 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "@libsql/client": "^0.18.0",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^13.2.0",
     "cloudinary": "^2.11.0",
     "compression": "^1.8.2",
     "ejs": "^7.0.2",

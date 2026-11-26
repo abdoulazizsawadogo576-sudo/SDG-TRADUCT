@@ -4,6 +4,8 @@
   <a href="/admin/produits/nouveau" class="btn btn-dark">+ Ajouter un produit</a>
 </div>
 
+<% if (ephemeral) { %><div class="alert alert-error"><strong>Attention :</strong> les photos sont enregistrées sur le disque temporaire de l'hébergeur et seront perdues au prochain redémarrage. Ajoutez la variable <code>CLOUDINARY_URL</code> (voir le guide, offre gratuite).</div><% } %>
+<% if (dbEphemeral) { %><div class="alert alert-error"><strong>Attention :</strong> la base de données est sur un disque temporaire. Ajoutez <code>DATABASE_URL</code> et <code>DATABASE_AUTH_TOKEN</code> (Turso, voir le guide).</div><% } %>
 <div class="stats">
   <a href="/admin/produits" class="stat"><span>Produits au total</span><strong><%= stats.total %></strong></a>
   <a href="/admin/produits?statut=visibles" class="stat"><span>Visibles en ligne</span><strong><%= stats.visible || 0 %></strong></a>
@@ -54,6 +56,6 @@
     <a href="/admin/parametres" class="btn btn-ghost">Logo, bannière, WhatsApp et réseaux sociaux</a>
     <a href="/admin/sauvegarde" class="btn btn-ghost">Télécharger une sauvegarde</a>
   </div>
-  <p class="muted small">Stockage des photos : <strong><%= storageDriver === 'cloudinary' ? 'Cloudinary (en ligne)' : 'disque du serveur' %></strong>.</p>
+  <p class="muted small">Stockage des photos : <strong><%= storageDriver === 'cloudinary' ? 'Cloudinary (en ligne)' : 'disque du serveur' %></strong> · Base de données : <strong><%= dbRemote ? 'Turso (en ligne)' : 'disque du serveur' %></strong>.</p>
 </section>
 <%- include('_bottom') %>

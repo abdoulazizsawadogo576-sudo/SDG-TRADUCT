@@ -1,28 +1,32 @@
-# Déploiement en un clic sur Render (https://render.com) — « New + » > « Blueprint »
+# Déploiement GRATUIT sur Render (https://render.com) — « New + » > « Blueprint »
+# Données sur Turso (base gratuite) et photos sur Cloudinary (gratuit) : voir GUIDE.md.
 services:
   - type: web
     name: boutique-whatsapp
     runtime: node
-    plan: starter            # le disque persistant nécessite une offre payante (~7 $/mois)
+    plan: free
+    region: frankfurt       # le plus proche du Burkina Faso
     buildCommand: npm ci --omit=dev
     startCommand: node server.js
     healthCheckPath: /sante
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DATA_DIR
-        value: /var/data
+      - key: EPHEMERAL_DISK
+        value: "1"
       - key: SESSION_SECRET
         generateValue: true
+      - key: WHATSAPP_NUMBER
+        value: "22654231847"
       - key: ADMIN_USERNAME
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_AUTH_TOKEN
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
       - key: SITE_URL
         sync: false
-      - key: WHATSAPP_NUMBER
-        value: "22654231847"
-    disk:
-      name: donnees
-      mountPath: /var/data
-      sizeGB: 5

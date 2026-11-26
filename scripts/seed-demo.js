@@ -32,11 +32,12 @@ const DEMO = [
 ];
 
 (async () => {
-  const demo = db.db.prepare("SELECT id FROM products WHERE reference LIKE 'DEMO-%'").all();
+  await db.init();
+  const demo = await db.all("SELECT id FROM products WHERE reference LIKE 'DEMO-%'");
   if (remove) {
     for (const { id } of demo) {
-      const p = db.getProduct(id);
-      db.deleteProduct(id);
+      const p = await db.getProduct(id);
+      await db.deleteProduct(id);
       for (const im of p.images) await storage.removeImage(im.storage_key);
     }
     console.log(`✔ ${demo.length} produit(s) de démonstration supprimé(s).`);
@@ -45,16 +46,16 @@ const DEMO = [
   if (demo.length) { console.log('Les produits de démonstration existent déjà.'); return; }
   let i = 1;
   for (const [name, price, old, catSlug, emoji, [c1, c2], featured, popular] of DEMO) {
-    const cat = db.getCategoryBySlug(catSlug);
-    const id = db.createProduct({
+    const cat = await db.getCategoryBySlug(catSlug);
+    const id = await db.createProduct({
       name, price, old_price: old, reference: `DEMO-${String(i++).padStart(2, '0')}`,
       short_description: 'Produit de démonstration — remplacez-le par vos vrais articles.',
       description: `${name} : un article de qualité sélectionné pour nos clients au Burkina Faso.\n\nCe texte est un exemple. Depuis l'espace administrateur, vous pouvez modifier la description, les photos et le prix.`,
       specs: [{ label: 'Garantie', value: '3 mois' }, { label: 'État', value: 'Neuf' }, { label: 'Livraison', value: 'Ouagadougou et Bobo-Dioulasso' }],
       category_id: cat && cat.id, is_visible: true, is_featured: !!featured, is_popular: !!popular, in_stock: true,
     });
-    db.addImage(id, await storage.saveImage(await picture(c1, c2, emoji)));
-    db.addImage(id, await storage.saveImage(await picture(c2, c1, emoji)));
+    await db.addImage(id, await storage.saveImage(await picture(c1, c2, emoji)));
+    await db.addImage(id, await storage.saveImage(await picture(c2, c1, emoji)));
   }
   console.log(`✔ ${DEMO.length} produits de démonstration ajoutés.`);
 })();

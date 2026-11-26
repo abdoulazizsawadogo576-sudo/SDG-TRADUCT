@@ -18,28 +18,30 @@ function withOrderLink(res, p) {
 }
 
 // ---------- Accueil ----------
-router.get('/', (req, res) => {
-  const categories = db.listCategories();
-  const featured = db.searchProducts({ visibleOnly: true, featured: true, sort: 'recent', limit: 8 }).items;
-  const latest = db.searchProducts({ visibleOnly: true, sort: 'recent', limit: 8 }).items;
-  const popular = db.searchProducts({ visibleOnly: true, sort: 'populaire', limit: 8 }).items;
-  const total = db.searchProducts({ visibleOnly: true, limit: 1 }).total;
+router.get('/', async (req, res) => {
+  const categories = res.locals.navCategories();
+  const [f, l, pop] = await Promise.all([
+    db.searchProducts({ visibleOnly: true, featured: true, sort: 'recent', limit: 8 }),
+    db.searchProducts({ visibleOnly: true, sort: 'recent', limit: 8 }),
+    db.searchProducts({ visibleOnly: true, sort: 'populaire', limit: 8 }),
+  ]);
+  const featured = f.items; const latest = l.items; const popular = pop.items; const total = l.total;
   [...featured, ...latest, ...popular].forEach((p) => withOrderLink(res, p));
   res.render('home', { title: null, categories, featured, latest, popular, total });
 });
 
 // ---------- Catalogue (recherche, filtre, tri, pagination) ----------
-router.get('/catalogue', (req, res) => {
+router.get('/catalogue', async (req, res) => {
   const q = String(req.query.q || '').slice(0, 100).trim();
   const sort = ['recent', 'prix_asc', 'prix_desc', 'populaire', 'nom'].includes(req.query.tri) ? req.query.tri : 'recent';
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-  const categories = db.listCategories();
+  const categories = res.locals.navCategories();
   let category = null;
   if (req.query.categorie) {
-    category = db.getCategoryBySlug(String(req.query.categorie));
+    category = await db.getCategoryBySlug(String(req.query.categorie));
     if (!category) return res.redirect('/catalogue' + (q ? `?q=${encodeURIComponent(q)}` : ''));
   }
-  const { total, items } = db.searchProducts({
+  const { total, items } = await db.searchProducts({
     visibleOnly: true, q, categoryId: category && category.id, sort, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE,
   });
   items.forEach((p) => withOrderLink(res, p));
@@ -58,17 +60,17 @@ router.get('/catalogue', (req, res) => {
 router.get('/categorie/:slug', (req, res) => res.redirect(301, `/catalogue?categorie=${encodeURIComponent(req.params.slug)}`));
 
 // ---------- Fiche produit ----------
-router.get('/produit/:slug', (req, res, next) => {
-  const p = db.getProductBySlug(req.params.slug);
+router.get('/produit/:slug', async (req, res, next) => {
+  const p = await db.getProductBySlug(req.params.slug);
   const isAdmin = !!(req.session && req.session.adminId);
   if (!p || (!p.is_visible && !isAdmin)) return next();
-  if (p.is_visible) db.incrementViews(p.id);
+  if (p.is_visible) db.incrementViews(p.id).catch(() => {});
   withOrderLink(res, p);
   const similar = p.category_id
-    ? db.searchProducts({ visibleOnly: true, categoryId: p.category_id, excludeId: p.id, sort: 'populaire', limit: 4 }).items
+    ? (await db.searchProducts({ visibleOnly: true, categoryId: p.category_id, excludeId: p.id, sort: 'populaire', limit: 4 })).items
     : [];
   if (similar.length < 4) {
-    const more = db.searchProducts({ visibleOnly: true, excludeId: p.id, sort: 'recent', limit: 8 }).items
+    const more = (await db.searchProducts({ visibleOnly: true, excludeId: p.id, sort: 'recent', limit: 8 })).items
       .filter((x) => !similar.some((s) => s.id === x.id));
     similar.push(...more.slice(0, 4 - similar.length));
   }
@@ -89,10 +91,10 @@ router.get('/produit/:slug', (req, res, next) => {
 });
 
 // ---------- API : recherche rapide ----------
-router.get('/api/recherche', (req, res) => {
+router.get('/api/recherche', async (req, res) => {
   const q = String(req.query.q || '').slice(0, 100).trim();
   if (q.length < 2) return res.json({ total: 0, items: [] });
-  const { total, items } = db.searchProducts({ visibleOnly: true, q, sort: 'populaire', limit: 6 });
+  const { total, items } = await db.searchProducts({ visibleOnly: true, q, sort: 'populaire', limit: 6 });
   res.json({
     total,
     items: items.map((p) => ({
@@ -103,9 +105,9 @@ router.get('/api/recherche', (req, res) => {
 });
 
 // ---------- API : comptage des clics « Commander » (statistiques) ----------
-router.post('/api/commande/:id', (req, res) => {
+router.post('/api/commande/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  if (id) db.incrementOrderClicks(id);
+  if (id) await db.incrementOrderClicks(id);
   res.status(204).end();
 });
 
@@ -142,11 +144,11 @@ router.get('/sante', (req, res) => res.json({ ok: true }));
 router.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nSitemap: ${res.locals.baseUrl}/sitemap.xml\n`);
 });
-router.get('/sitemap.xml', (req, res) => {
+router.get('/sitemap.xml', async (req, res) => {
   const base = res.locals.baseUrl;
-  const { items } = db.searchProducts({ visibleOnly: true, limit: 200 });
+  const { items } = await db.searchProducts({ visibleOnly: true, limit: 200 });
   const urls = [`${base}/`, `${base}/catalogue`, `${base}/comment-commander`,
-    ...db.listCategories().map((c) => `${base}/catalogue?categorie=${c.slug}`),
+    ...res.locals.navCategories().map((c) => `${base}/catalogue?categorie=${c.slug}`),
     ...items.map((p) => productUrl(base, p))];
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${
     urls.map((u) => `  <url><loc>${h.escapeHtml(u)}</loc></url>`).join('\n')}\n</urlset>`);

@@ -2,33 +2,27 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
-const { db, getAdmin, countAdmins, createAdmin, getAdminByUsername } = require('./db');
+const db = require('./db');
+const { getAdmin, countAdmins, createAdmin, getAdminByUsername } = db;
 const config = require('./config');
 
 // ---------- Stockage des sessions dans SQLite (survit aux redémarrages) ----------
 class SqliteStore extends session.Store {
   constructor() {
     super();
-    this.getStmt = db.prepare('SELECT data, expires FROM sessions WHERE sid = ?');
-    this.setStmt = db.prepare('INSERT INTO sessions (sid, data, expires) VALUES (?, ?, ?) ON CONFLICT(sid) DO UPDATE SET data = excluded.data, expires = excluded.expires');
-    this.delStmt = db.prepare('DELETE FROM sessions WHERE sid = ?');
-    setInterval(() => db.prepare('DELETE FROM sessions WHERE expires < ?').run(Date.now()), 3600e3).unref();
+    setInterval(() => db.purgeSessions().catch(() => {}), 3600e3).unref();
   }
   get(sid, cb) {
-    try {
-      const row = this.getStmt.get(sid);
+    db.getSession(sid).then((row) => {
       if (!row || row.expires < Date.now()) return cb(null, null);
       cb(null, JSON.parse(row.data));
-    } catch (e) { cb(e); }
+    }, cb);
   }
   set(sid, sess, cb) {
-    try {
-      const exp = sess.cookie && sess.cookie.expires ? new Date(sess.cookie.expires).getTime() : Date.now() + 86400e3;
-      this.setStmt.run(sid, JSON.stringify(sess), exp);
-      cb && cb(null);
-    } catch (e) { cb && cb(e); }
+    const exp = sess.cookie && sess.cookie.expires ? new Date(sess.cookie.expires).getTime() : Date.now() + 86400e3;
+    db.setSession(sid, JSON.stringify(sess), exp).then(() => cb && cb(null), (e) => cb && cb(e));
   }
-  destroy(sid, cb) { try { this.delStmt.run(sid); cb && cb(null); } catch (e) { cb && cb(e); } }
+  destroy(sid, cb) { db.deleteSession(sid).then(() => cb && cb(null), (e) => cb && cb(e)); }
   touch(sid, sess, cb) { this.set(sid, sess, cb); }
 }
 
@@ -45,10 +39,10 @@ function sessionMiddleware() {
 }
 
 // ---------- Création du compte administrateur au démarrage ----------
-function ensureAdmin() {
-  if (countAdmins() > 0) return;
+async function ensureAdmin() {
+  if (await countAdmins() > 0) return;
   if (config.adminUsername && config.adminPassword) {
-    createAdmin(config.adminUsername, bcrypt.hashSync(config.adminPassword, 12));
+    await createAdmin(config.adminUsername, bcrypt.hashSync(config.adminPassword, 12));
     console.log(`✔ Compte administrateur « ${config.adminUsername} » créé.`);
   } else {
     console.warn('⚠ Aucun administrateur. Définissez ADMIN_USERNAME et ADMIN_PASSWORD puis redémarrez, ou lancez : npm run create-admin');
@@ -74,16 +68,16 @@ function recordFailure(key) {
 function clearFailures(key) { attempts.delete(key); }
 
 async function verifyLogin(username, password) {
-  const admin = getAdminByUsername(String(username || '').trim());
+  const admin = await getAdminByUsername(String(username || '').trim());
   // Comparaison toujours effectuée pour éviter de révéler l'existence du compte
   const hash = admin ? admin.password_hash : (verifyLogin.dummy ||= bcrypt.hashSync('dummy-password', 12));
   const ok = await bcrypt.compare(String(password || ''), hash);
   return ok && admin ? admin : null;
 }
 
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
   if (req.session && req.session.adminId) {
-    const admin = getAdmin(req.session.adminId);
+    const admin = await getAdmin(req.session.adminId);
     if (admin) { req.admin = admin; res.locals.admin = admin; return next(); }
   }
   if (req.method === 'GET') req.session.returnTo = req.originalUrl;

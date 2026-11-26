@@ -3,9 +3,8 @@ const config = require('./src/config');
 const { createApp } = require('./src/app');
 const storage = require('./src/storage');
 
-const app = createApp();
-app.listen(config.port, () => {
+createApp().then((app) => app.listen(config.port, () => {
   console.log(`🛍  Boutique démarrée sur http://localhost:${config.port}`);
   console.log(`   Espace administrateur : http://localhost:${config.port}/admin`);
-  console.log(`   Données : ${config.dataDir} — images : ${storage.driver === 'cloudinary' ? 'Cloudinary' : 'disque local'}`);
-});
+  console.log(`   Base : ${config.databaseUrl ? 'Turso (en ligne)' : config.dbFile} — images : ${storage.driver === 'cloudinary' ? 'Cloudinary' : 'disque local'}`);
+})).catch((e) => { console.error('Démarrage impossible :', e); process.exit(1); });

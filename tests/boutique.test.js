@@ -37,7 +37,7 @@ async function makeImage(color, w = 2400, h = 1800) {
 }
 
 test.before(async () => {
-  const app = createApp();
+  const app = await createApp();
   await new Promise((resolve) => { server = app.listen(0, resolve); });
   base = `http://127.0.0.1:${server.address().port}`;
 });
@@ -265,6 +265,16 @@ test('paramètres : nom de boutique, numéro WhatsApp et réseaux sociaux', asyn
   assert.match(home.body, /href="https:\/\/facebook\.com\/maboutique"/);
   assert.match(home.body, /class="brand-logo"/);
   assert.doesNotMatch(home.body, /aria-label="Instagram"/, 'réseau non renseigné non affiché');
+});
+
+test('sauvegarde complète téléchargeable', async () => {
+  const r = await req('/admin/sauvegarde');
+  assert.strictEqual(r.status, 200);
+  assert.match(r.headers.get('content-disposition'), /sauvegarde-boutique-.*\.json/);
+  const data = await r.json();
+  assert.strictEqual(data.products.length, 1);
+  assert.ok(data.categories.length >= 9);
+  assert.ok(data.settings.some((x) => x.key === 'shop_name' && x.value === 'Ma Super Boutique'));
 });
 
 test('suppression d\'un produit et de ses photos', async () => {

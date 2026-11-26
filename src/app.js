@@ -5,11 +5,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const config = require('./config');
 const h = require('./helpers');
-const { getSettings, listCategories } = require('./db');
+const db = require('./db');
 const { sessionMiddleware, ensureAdmin, csrfToken } = require('./auth');
 
-function createApp() {
-  ensureAdmin();
+async function createApp() {
+  await db.init();
+  await ensureAdmin();
   const app = express();
   app.set('trust proxy', 1);
   app.set('view engine', 'ejs');
@@ -43,8 +44,8 @@ function createApp() {
   app.use(sessionMiddleware());
 
   // Variables disponibles dans toutes les vues
-  app.use((req, res, next) => {
-    const settings = getSettings();
+  app.use(async (req, res, next) => {
+    const [settings, categories] = await Promise.all([db.getSettings(), db.listCategories()]);
     const baseUrl = config.siteUrl || `${req.protocol}://${req.get('host')}`;
     res.locals.settings = settings;
     res.locals.h = h;
@@ -55,7 +56,7 @@ function createApp() {
     delete req.session.flash;
     res.locals.csrf = () => csrfToken(req);
     res.locals.waGeneral = h.whatsappLink(settings.whatsapp_number, h.generalMessage(settings.shop_name));
-    res.locals.navCategories = () => listCategories();
+    res.locals.navCategories = () => categories;
     req.flash = (type, msg) => { req.session.flash = { type, msg }; };
     next();
   });

@@ -30,7 +30,7 @@ Catalogue en ligne professionnel pour le Burkina Faso : les clients parcourent l
 ```
 server.js              Démarrage du serveur
 src/config.js          Configuration (variables d'environnement / fichier .env)
-src/db.js              Base SQLite : schéma, catégories, produits, photos, paramètres
+src/db.js              Base SQLite/libSQL (local ou Turso) : schéma, catégories, produits, photos, paramètres
 src/storage.js         Stockage des photos : disque persistant ou Cloudinary
 src/auth.js            Sessions (stockées en base), connexion, protection CSRF et anti-force brute
 src/helpers.js         Prix FCFA, liens et messages WhatsApp, recherche
@@ -41,7 +41,7 @@ public/                CSS, JavaScript, images
 tests/                 Tests automatiques (npm test)
 ```
 
-Technologies : Node.js 20+, Express 5, SQLite (better-sqlite3), Sharp (optimisation d'images), EJS. Aucun framework front-end lourd : pages légères, rapides en 3G/4G.
+Technologies : Node.js 20+, Express 5, SQLite/libSQL (fichier local ou base en ligne Turso), Cloudinary (photos, facultatif), Sharp (optimisation d'images), EJS. Aucun framework front-end lourd : pages légères, rapides en 3G/4G.
 
 ## Lancer en local
 
@@ -57,5 +57,7 @@ npm test                    # tests automatiques
 Mot de passe oublié : `npm run create-admin -- admin NouveauMotDePasse` sur le serveur.
 
 ## Mise en ligne
+
+Hébergement **gratuit** possible : Render (offre gratuite) + Turso (base) + Cloudinary (photos).
 
 Voir le guide pas à pas : **[GUIDE.md](GUIDE.md)**.

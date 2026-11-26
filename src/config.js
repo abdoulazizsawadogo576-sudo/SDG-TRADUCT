@@ -29,6 +29,11 @@ module.exports = {
   adminPassword: process.env.ADMIN_PASSWORD || '',
   // Si CLOUDINARY_URL est défini, les images sont stockées sur Cloudinary au lieu du disque.
   cloudinaryUrl: process.env.CLOUDINARY_URL || '',
+  // Base en ligne Turso (gratuite) : libsql://nom-de-la-base.turso.io + jeton d'accès
+  databaseUrl: process.env.DATABASE_URL || '',
+  databaseToken: process.env.DATABASE_AUTH_TOKEN || '',
+  // Mettre EPHEMERAL_DISK=1 sur un hébergement gratuit sans disque permanent (affiche des alertes dans l'admin)
+  ephemeralDisk: process.env.EPHEMERAL_DISK === '1',
   defaultWhatsapp: process.env.WHATSAPP_NUMBER || '22654231847',
 };
 
