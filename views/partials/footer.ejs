@@ -7,7 +7,7 @@
     <div>
       <div class="brand brand-footer">
         <% if (settings.logo_url) { %><img src="<%= settings.logo_url %>" alt="" class="brand-logo" width="40" height="40"><% } else { %>
-        <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span><% } %>
+        <img src="/img/logo.svg" alt="" class="brand-logo" width="40" height="40"><% } %>
         <span class="brand-name"><%= settings.shop_name %></span>
       </div>
       <p class="footer-text"><%= settings.tagline %></p>
@@ -31,6 +31,7 @@
         <li>Appuyez sur « Commander sur WhatsApp ».</li>
         <li>Envoyez le message : nous vous répondons rapidement.</li>
       </ol>
+      <a href="/comment-commander" class="footer-more">Questions fréquentes →</a>
     </div>
     <div>
       <h3 class="footer-title">Contact</h3>

@@ -2,6 +2,8 @@
 
 Catalogue en ligne professionnel pour le Burkina Faso : les clients parcourent les produits, consultent photos et prix en FCFA, puis commandent en un clic sur **WhatsApp** (message prérempli : produit, prix, référence et lien). Pas de paiement en ligne.
 
+[![Déployer sur Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/abdoulazizsawadogo576-sudo/SDG-TRADUCT)
+
 ## Fonctionnalités
 
 **Côté client** (mobile d'abord)

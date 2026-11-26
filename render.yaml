@@ -6,7 +6,7 @@ services:
     plan: starter            # le disque persistant nécessite une offre payante (~7 $/mois)
     buildCommand: npm ci --omit=dev
     startCommand: node server.js
-    healthCheckPath: /robots.txt
+    healthCheckPath: /sante
     envVars:
       - key: NODE_ENV
         value: production

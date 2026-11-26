@@ -20,7 +20,10 @@
   <meta property="og:locale" content="fr_FR">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="<%= settings.logo_url || '/img/favicon.svg' %>">
-  <link rel="apple-touch-icon" href="<%= settings.logo_url || '/img/favicon.svg' %>">
+  <link rel="apple-touch-icon" href="<%= settings.logo_url || '/img/apple-touch-icon.png' %>">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="<%= settings.shop_name %>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">

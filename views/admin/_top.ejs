@@ -2,7 +2,7 @@
 <header class="a-header">
   <div class="a-header-inner">
     <a href="/admin" class="brand">
-      <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span>
+      <img src="<%= settings.logo_url || '/img/logo.svg' %>" alt="" class="brand-logo" width="40" height="40">
       <span class="brand-text"><span class="brand-name"><%= settings.shop_name %></span><span class="brand-tag">Espace administrateur</span></span>
     </a>
     <div class="a-header-actions">

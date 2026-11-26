@@ -109,6 +109,35 @@ router.post('/api/commande/:id', (req, res) => {
   res.status(204).end();
 });
 
+// ---------- Page « Comment commander » ----------
+router.get('/comment-commander', (req, res) => {
+  res.render('how-to-order', { title: 'Comment commander', description: 'Commandez en quelques secondes sur WhatsApp : choisissez, envoyez le message, nous vous répondons.' });
+});
+
+// ---------- Application installable (Ajouter à l'écran d'accueil) ----------
+router.get('/manifest.webmanifest', (req, res) => {
+  const s = res.locals.settings;
+  res.type('application/manifest+json').json({
+    name: s.shop_name,
+    short_name: s.shop_name.slice(0, 12),
+    description: s.tagline,
+    lang: 'fr',
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    background_color: '#f6f5f1',
+    theme_color: '#12141a',
+    icons: [
+      { src: '/img/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/img/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: '/img/icon-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+  });
+});
+
+// ---------- Vérification de santé (hébergeur) ----------
+router.get('/sante', (req, res) => res.json({ ok: true }));
+
 // ---------- SEO ----------
 router.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nSitemap: ${res.locals.baseUrl}/sitemap.xml\n`);
@@ -116,7 +145,7 @@ router.get('/robots.txt', (req, res) => {
 router.get('/sitemap.xml', (req, res) => {
   const base = res.locals.baseUrl;
   const { items } = db.searchProducts({ visibleOnly: true, limit: 200 });
-  const urls = [`${base}/`, `${base}/catalogue`,
+  const urls = [`${base}/`, `${base}/catalogue`, `${base}/comment-commander`,
     ...db.listCategories().map((c) => `${base}/catalogue?categorie=${c.slug}`),
     ...items.map((p) => productUrl(base, p))];
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${

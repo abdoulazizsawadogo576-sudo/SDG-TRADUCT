@@ -5,7 +5,7 @@
 Le site a besoin d'un **disque permanent** pour la base de données et les photos. Render le propose avec l'offre « Starter » (environ 7 $/mois + 0,25 $/Go de disque).
 
 1. Créez un compte sur **https://render.com** (connexion avec GitHub).
-2. Cliquez sur **New +** → **Blueprint**, puis choisissez le dépôt GitHub **SDG-TRADUCT** (branche contenant le site).
+2. Ouvrez le dépôt GitHub **SDG-TRADUCT** et cliquez sur le bouton **Deploy to Render** en haut du README (ou, dans Render : **New +** → **Blueprint** → dépôt **SDG-TRADUCT**).
 3. Render lit le fichier `render.yaml` et vous demande 3 valeurs :
    - `ADMIN_USERNAME` : votre identifiant (ex. `gerant`)
    - `ADMIN_PASSWORD` : un mot de passe solide (12 caractères ou plus)

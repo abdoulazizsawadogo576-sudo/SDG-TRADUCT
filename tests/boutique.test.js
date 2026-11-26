@@ -53,6 +53,17 @@ test('les pages publiques s\'affichent (catalogue vide)', async () => {
   assert.match(home.body, /https:\/\/wa\.me\/22654231847\?text=/, 'bouton WhatsApp flottant');
 });
 
+test('page « Comment commander », manifeste et santé', async () => {
+  const page = await html('/comment-commander');
+  assert.strictEqual(page.status, 200);
+  assert.match(page.body, /Questions fréquentes/);
+  const man = await (await req('/manifest.webmanifest')).json();
+  assert.strictEqual(man.display, 'standalone');
+  for (const ic of man.icons) assert.strictEqual((await req(ic.src)).status, 200);
+  assert.strictEqual((await req('/sante')).status, 200);
+  assert.match(await (await req('/sitemap.xml')).text(), /comment-commander/);
+});
+
 test('l\'espace admin est protégé', async () => {
   const r = await req('/admin');
   assert.strictEqual(r.status, 302);

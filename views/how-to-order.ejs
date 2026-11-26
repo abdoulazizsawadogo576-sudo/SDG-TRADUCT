@@ -1,0 +1,37 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main class="container page">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="/">Accueil</a><span>/</span><span>Comment commander</span></nav>
+  <h1 class="page-title">Comment commander ?</h1>
+  <p class="counter">Pas de compte à créer, pas de paiement en ligne : tout se passe sur WhatsApp.</p>
+
+  <ol class="steps">
+    <li class="step reveal">
+      <span class="step-num">1</span>
+      <div><h2>Choisissez votre article</h2><p>Parcourez le <a href="/catalogue" class="u">catalogue</a>, utilisez la recherche ou les catégories, puis ouvrez la fiche du produit pour voir les photos, le prix et les caractéristiques.</p></div>
+    </li>
+    <li class="step reveal">
+      <span class="step-num">2</span>
+      <div><h2>Appuyez sur « Commander sur WhatsApp »</h2><p>WhatsApp s'ouvre avec un message déjà rempli : nom du produit, prix, référence et lien. Vous n'avez rien à recopier.</p></div>
+    </li>
+    <li class="step reveal">
+      <span class="step-num">3</span>
+      <div><h2>Envoyez le message</h2><p>Nous vous répondons pour confirmer la disponibilité, convenir de la livraison ou du retrait et du mode de paiement.</p></div>
+    </li>
+  </ol>
+
+  <section class="panel faq">
+    <h2 class="panel-title">Questions fréquentes</h2>
+    <details><summary>Faut-il installer quelque chose ?</summary><p>Non. Il suffit d'avoir WhatsApp sur votre téléphone (Android ou iPhone). Sur ordinateur, WhatsApp Web s'ouvre automatiquement.</p></details>
+    <details><summary>Puis-je poser une question avant d'acheter ?</summary><p>Bien sûr : le bouton vert en bas de l'écran vous permet de nous écrire à tout moment, sur n'importe quelle page.</p></details>
+    <details><summary>Où livrez-vous ?</summary><p><%= settings.delivery_text %>. Précisez votre quartier ou votre ville dans le message.</p></details>
+    <details><summary>Comment partager un produit avec un proche ?</summary><p>Sur chaque fiche produit, utilisez les boutons « Partager » (WhatsApp, Facebook, Telegram…) ou copiez le lien.</p></details>
+    <details><summary>Puis-je installer le site comme une application ?</summary><p>Oui. Sur Android (Chrome) : menu ⋮ → « Ajouter à l'écran d'accueil ». Sur iPhone (Safari) : bouton Partager → « Sur l'écran d'accueil ».</p></details>
+  </section>
+
+  <div class="cta-band">
+    <div><h2>Une question ? Écrivez-nous</h2><p><%= h.displayPhone(settings.whatsapp_number) %> — <%= settings.city %></p></div>
+    <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa btn-lg"><svg class="ic"><use href="#i-whatsapp"/></svg> Discuter sur WhatsApp</a>
+  </div>
+</main>
+<%- include('partials/footer') %>

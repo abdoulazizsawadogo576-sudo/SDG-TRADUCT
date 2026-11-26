@@ -10,7 +10,7 @@
       <% if (settings.logo_url) { %>
         <img src="<%= settings.logo_url %>" alt="" class="brand-logo" width="40" height="40">
       <% } else { %>
-        <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span>
+        <img src="/img/logo.svg" alt="" class="brand-logo" width="40" height="40">
       <% } %>
       <span class="brand-text">
         <span class="brand-name"><%= settings.shop_name %></span>
@@ -28,6 +28,7 @@
 
     <nav class="header-nav">
       <a href="/catalogue" class="nav-link <%= currentPath === '/catalogue' ? 'active' : '' %>"><svg class="ic"><use href="#i-grid"/></svg><span>Catalogue</span></a>
+      <a href="/comment-commander" class="nav-link nav-help <%= currentPath === '/comment-commander' ? 'active' : '' %>"><span>Comment commander</span></a>
       <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa btn-sm header-wa"><svg class="ic"><use href="#i-whatsapp"/></svg><span>Nous écrire</span></a>
     </nav>
   </div>
