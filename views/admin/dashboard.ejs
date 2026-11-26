@@ -1,0 +1,59 @@
+<%- include('_top') %>
+<div class="a-head">
+  <div><h1>Bonjour <%= admin.username %> 👋</h1><p class="muted">Voici l'état de votre boutique.</p></div>
+  <a href="/admin/produits/nouveau" class="btn btn-dark">+ Ajouter un produit</a>
+</div>
+
+<div class="stats">
+  <a href="/admin/produits" class="stat"><span>Produits au total</span><strong><%= stats.total %></strong></a>
+  <a href="/admin/produits?statut=visibles" class="stat"><span>Visibles en ligne</span><strong><%= stats.visible || 0 %></strong></a>
+  <a href="/admin/produits?statut=masques" class="stat"><span>Masqués</span><strong><%= stats.hidden || 0 %></strong></a>
+  <a href="/admin/produits?statut=vedette" class="stat"><span>Mis en avant</span><strong><%= stats.featured || 0 %></strong></a>
+  <div class="stat"><span>Vues des fiches</span><strong><%= stats.views %></strong></div>
+  <div class="stat stat-wa"><span>Clics « Commander »</span><strong><%= stats.order_clicks %></strong></div>
+</div>
+
+<div class="a-cols">
+  <section class="a-card">
+    <div class="a-card-head"><h2>Derniers produits ajoutés</h2><a href="/admin/produits" class="link">Tout voir</a></div>
+    <% if (!recent.length) { %>
+      <div class="a-empty">
+        <p>Votre catalogue est vide. Commencez par ajouter votre premier produit !</p>
+        <a href="/admin/produits/nouveau" class="btn btn-dark">+ Ajouter un produit</a>
+      </div>
+    <% } else { %>
+      <ul class="mini-list">
+        <% recent.forEach(p => { %>
+          <li><a href="/admin/produits/<%= p.id %>">
+            <img src="<%= p.main_image ? p.main_image.thumb_url : '/img/placeholder.svg' %>" alt="">
+            <span class="mini-name"><%= p.name %><small><%= h.formatPrice(p.price) %> · <%= p.is_visible ? 'Visible' : 'Masqué' %></small></span>
+          </a></li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+  <section class="a-card">
+    <div class="a-card-head"><h2>Les plus demandés</h2></div>
+    <% if (!top.length) { %><p class="muted">Les statistiques apparaîtront dès que des clients visiteront vos fiches.</p><% } else { %>
+      <ul class="mini-list">
+        <% top.forEach(p => { %>
+          <li><a href="/admin/produits/<%= p.id %>">
+            <img src="<%= p.main_image ? p.main_image.thumb_url : '/img/placeholder.svg' %>" alt="">
+            <span class="mini-name"><%= p.name %><small><%= p.views %> vue(s) · <%= p.order_clicks %> clic(s) WhatsApp</small></span>
+          </a></li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+</div>
+
+<section class="a-card">
+  <div class="a-card-head"><h2>Raccourcis</h2></div>
+  <div class="shortcuts">
+    <a href="/admin/categories" class="btn btn-ghost">Gérer les catégories (<%= categories.length %>)</a>
+    <a href="/admin/parametres" class="btn btn-ghost">Logo, bannière, WhatsApp et réseaux sociaux</a>
+    <a href="/admin/sauvegarde" class="btn btn-ghost">Télécharger une sauvegarde</a>
+  </div>
+  <p class="muted small">Stockage des photos : <strong><%= storageDriver === 'cloudinary' ? 'Cloudinary (en ligne)' : 'disque du serveur' %></strong>.</p>
+</section>
+<%- include('_bottom') %>

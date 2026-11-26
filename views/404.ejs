@@ -1,0 +1,14 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main class="container page">
+  <div class="empty">
+    <span class="empty-icon">🧭</span>
+    <h1><%= title %></h1>
+    <p><%= typeof errorMessage !== 'undefined' ? errorMessage : "Cette page n'existe pas ou ce produit n'est plus disponible." %></p>
+    <div class="empty-actions">
+      <a href="/" class="btn btn-dark">Retour à l'accueil</a>
+      <a href="/catalogue" class="btn btn-ghost">Voir le catalogue</a>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

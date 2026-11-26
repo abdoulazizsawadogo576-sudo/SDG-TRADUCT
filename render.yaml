@@ -1,0 +1,28 @@
+# Déploiement en un clic sur Render (https://render.com) — « New + » > « Blueprint »
+services:
+  - type: web
+    name: boutique-whatsapp
+    runtime: node
+    plan: starter            # le disque persistant nécessite une offre payante (~7 $/mois)
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /robots.txt
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: WHATSAPP_NUMBER
+        value: "22654231847"
+    disk:
+      name: donnees
+      mountPath: /var/data
+      sizeGB: 5

@@ -1,0 +1,58 @@
+<% const socials = [
+  ['facebook_url', 'Facebook', 'i-facebook'], ['instagram_url', 'Instagram', 'i-instagram'],
+  ['tiktok_url', 'TikTok', 'i-tiktok'], ['youtube_url', 'YouTube', 'i-youtube'],
+].filter(([k]) => settings[k]); %>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="brand brand-footer">
+        <% if (settings.logo_url) { %><img src="<%= settings.logo_url %>" alt="" class="brand-logo" width="40" height="40"><% } else { %>
+        <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span><% } %>
+        <span class="brand-name"><%= settings.shop_name %></span>
+      </div>
+      <p class="footer-text"><%= settings.tagline %></p>
+      <div class="socials">
+        <a href="<%= waGeneral %>" target="_blank" rel="noopener" aria-label="WhatsApp" class="social"><svg class="ic"><use href="#i-whatsapp"/></svg></a>
+        <% socials.forEach(([k, label, icon]) => { %>
+          <a href="<%= settings[k] %>" target="_blank" rel="noopener" aria-label="<%= label %>" class="social"><svg class="ic"><use href="#<%= icon %>"/></svg></a>
+        <% }) %>
+      </div>
+    </div>
+    <div>
+      <h3 class="footer-title">Catégories</h3>
+      <ul class="footer-links">
+        <% navCategories().slice(0, 8).forEach(c => { %><li><a href="/catalogue?categorie=<%= c.slug %>"><%= c.name %></a></li><% }) %>
+      </ul>
+    </div>
+    <div>
+      <h3 class="footer-title">Comment commander ?</h3>
+      <ol class="footer-steps">
+        <li>Choisissez votre article dans le catalogue.</li>
+        <li>Appuyez sur « Commander sur WhatsApp ».</li>
+        <li>Envoyez le message : nous vous répondons rapidement.</li>
+      </ol>
+    </div>
+    <div>
+      <h3 class="footer-title">Contact</h3>
+      <ul class="footer-links">
+        <li><a href="<%= waGeneral %>" target="_blank" rel="noopener">WhatsApp : <%= h.displayPhone(settings.whatsapp_number) %></a></li>
+        <li><a href="tel:+<%= h.cleanPhone(settings.whatsapp_number) %>">Appeler : <%= h.displayPhone(settings.whatsapp_number) %></a></li>
+        <li><span><%= settings.city %></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <%= new Date().getFullYear() %> <%= settings.shop_name %>. Tous droits réservés.</span>
+    <span>Prix en FCFA</span>
+  </div>
+</footer>
+
+<a href="<%= typeof floatingWa !== 'undefined' && floatingWa ? floatingWa : waGeneral %>" target="_blank" rel="noopener"
+   class="wa-float <%= typeof floatingWa !== 'undefined' && floatingWa ? 'wa-float-raised' : '' %>" aria-label="Discuter sur WhatsApp"
+   <% if (typeof floatingOrderId !== 'undefined') { %>data-order-id="<%= floatingOrderId %>"<% } %>>
+  <svg class="ic"><use href="#i-whatsapp"/></svg>
+  <span class="wa-float-label">Besoin d'aide ?</span>
+</a>
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+</body>
+</html>

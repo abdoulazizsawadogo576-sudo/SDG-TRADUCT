@@ -1,0 +1,104 @@
+<% const p = product;
+   const discount = p.old_price && p.old_price > p.price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+   const imgs = p.images.length ? p.images : [{ url: '/img/placeholder.svg', thumb_url: '/img/placeholder.svg' }]; %>
+<%- include('partials/head', { bodyClass: 'has-order-bar' }) %>
+<%- include('partials/header') %>
+<main class="container page">
+  <% if (previewHidden) { %><div class="notice">👁️ Aperçu administrateur : ce produit est <strong>masqué</strong> et invisible pour les clients.</div><% } %>
+  <nav class="breadcrumb" aria-label="Fil d'Ariane">
+    <a href="/">Accueil</a><span>/</span>
+    <% if (p.category_slug) { %><a href="/catalogue?categorie=<%= p.category_slug %>"><%= p.category_name %></a><span>/</span><% } %>
+    <span><%= p.name %></span>
+  </nav>
+
+  <div class="product">
+    <div class="gallery" data-gallery>
+      <div class="gallery-main">
+        <div class="gallery-track" data-gallery-track>
+          <% imgs.forEach((im, i) => { %>
+            <div class="gallery-slide"><img src="<%= im.url %>" alt="<%= p.name %> — photo <%= i + 1 %>" <%= i === 0 ? 'fetchpriority=high' : 'loading=lazy' %> decoding="async" width="1200" height="1200"></div>
+          <% }) %>
+        </div>
+        <% if (imgs.length > 1) { %>
+          <button type="button" class="gallery-nav prev" data-gallery-prev aria-label="Photo précédente"><svg class="ic"><use href="#i-chev-l"/></svg></button>
+          <button type="button" class="gallery-nav next" data-gallery-next aria-label="Photo suivante"><svg class="ic"><use href="#i-chev-r"/></svg></button>
+          <span class="gallery-count" data-gallery-count>1 / <%= imgs.length %></span>
+        <% } %>
+        <span class="badges">
+          <% if (!p.in_stock) { %><span class="badge badge-dark">Rupture de stock</span><% } else if (discount) { %><span class="badge badge-sale">-<%= discount %>%</span><% } %>
+        </span>
+      </div>
+      <% if (imgs.length > 1) { %>
+        <div class="gallery-thumbs">
+          <% imgs.forEach((im, i) => { %>
+            <button type="button" class="thumb <%= i === 0 ? 'active' : '' %>" data-gallery-thumb="<%= i %>" aria-label="Afficher la photo <%= i + 1 %>"><img src="<%= im.thumb_url %>" alt="" loading="lazy" width="120" height="120"></button>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="product-info">
+      <% if (p.category_name) { %><a href="/catalogue?categorie=<%= p.category_slug %>" class="card-cat"><%= p.category_name %></a><% } %>
+      <h1 class="product-title"><%= p.name %></h1>
+      <p class="product-ref">Référence : <strong><%= p.reference %></strong></p>
+      <div class="product-price">
+        <span class="price price-lg"><%= h.formatPrice(p.price) %></span>
+        <% if (discount) { %><span class="old-price"><%= h.formatPrice(p.old_price) %></span><span class="badge badge-sale">Économisez <%= h.formatPrice(p.old_price - p.price) %></span><% } %>
+      </div>
+      <p class="stock <%= p.in_stock ? 'in' : 'out' %>"><span class="dot"></span><%= p.in_stock ? 'Disponible' : 'Rupture de stock — contactez-nous pour le réapprovisionnement' %></p>
+      <% if (p.short_description) { %><p class="product-lead"><%= p.short_description %></p><% } %>
+
+      <a href="<%= p.whatsapp_url %>" target="_blank" rel="noopener" class="btn btn-wa btn-xl btn-block order-btn" data-order-id="<%= p.id %>">
+        <svg class="ic"><use href="#i-whatsapp"/></svg> COMMANDER SUR WHATSAPP
+      </a>
+      <p class="order-hint">WhatsApp s'ouvre avec un message prêt à envoyer contenant le nom, le prix, la référence et le lien de ce produit.</p>
+
+      <div class="share">
+        <span class="share-label">Partager :</span>
+        <button type="button" class="share-btn" data-native-share data-title="<%= p.name %>" data-url="<%= p.absolute_url %>" aria-label="Partager" hidden><svg class="ic"><use href="#i-share"/></svg></button>
+        <a class="share-btn wa" href="<%= share.whatsapp %>" target="_blank" rel="noopener" aria-label="Partager sur WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></a>
+        <a class="share-btn fb" href="<%= share.facebook %>" target="_blank" rel="noopener" aria-label="Partager sur Facebook"><svg class="ic"><use href="#i-facebook"/></svg></a>
+        <a class="share-btn tg" href="<%= share.telegram %>" target="_blank" rel="noopener" aria-label="Partager sur Telegram"><svg class="ic"><use href="#i-telegram"/></svg></a>
+        <a class="share-btn xx" href="<%= share.x %>" target="_blank" rel="noopener" aria-label="Partager sur X"><svg class="ic"><use href="#i-x"/></svg></a>
+        <button type="button" class="share-btn" data-copy="<%= p.absolute_url %>" aria-label="Copier le lien"><svg class="ic"><use href="#i-link"/></svg></button>
+      </div>
+
+      <ul class="assurances">
+        <li><svg class="ic"><use href="#i-chat"/></svg> Réponse rapide sur WhatsApp</li>
+        <li><svg class="ic"><use href="#i-truck"/></svg> <%= settings.delivery_text %></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="product-details">
+    <% if (p.description) { %>
+      <section class="panel">
+        <h2 class="panel-title">Description</h2>
+        <div class="prose"><%- h.textToHtml(p.description) %></div>
+      </section>
+    <% } %>
+    <% if (p.specs.length) { %>
+      <section class="panel">
+        <h2 class="panel-title">Caractéristiques</h2>
+        <dl class="specs">
+          <% p.specs.forEach(s => { %><div class="spec"><dt><%= s.label || '•' %></dt><dd><%= s.value %></dd></div><% }) %>
+        </dl>
+      </section>
+    <% } %>
+  </div>
+
+  <% if (similar.length) { %>
+  <section class="section">
+    <div class="section-head"><div><h2 class="section-title">Vous aimerez aussi</h2></div></div>
+    <div class="grid">
+      <% similar.forEach(s => { %><%- include('partials/product-card', { p: s }) %><% }) %>
+    </div>
+  </section>
+  <% } %>
+</main>
+
+<div class="order-bar">
+  <div class="order-bar-price"><span><%= p.name %></span><strong><%= h.formatPrice(p.price) %></strong></div>
+  <a href="<%= p.whatsapp_url %>" target="_blank" rel="noopener" class="btn btn-wa" data-order-id="<%= p.id %>"><svg class="ic"><use href="#i-whatsapp"/></svg> Commander</a>
+</div>
+<%- include('partials/footer', { floatingWa: p.whatsapp_url, floatingOrderId: p.id }) %>

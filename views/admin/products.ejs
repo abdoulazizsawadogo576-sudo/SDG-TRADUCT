@@ -1,0 +1,61 @@
+<%- include('_top') %>
+<div class="a-head">
+  <div><h1>Produits</h1><p class="muted"><%= items.length %> produit(s) affiché(s) sur <%= total %></p></div>
+  <a href="/admin/produits/nouveau" class="btn btn-dark">+ Ajouter un produit</a>
+</div>
+
+<form method="get" class="a-filters" data-autosubmit>
+  <input type="search" name="q" value="<%= q %>" placeholder="Rechercher (nom, référence…)" class="input">
+  <select name="categorie" class="input">
+    <option value="">Toutes les catégories</option>
+    <% categories.forEach(c => { %><option value="<%= c.id %>" <%= categoryId === c.id ? 'selected' : '' %>><%= c.name %></option><% }) %>
+  </select>
+  <select name="statut" class="input">
+    <option value="">Tous les statuts</option>
+    <option value="visibles" <%= statut === 'visibles' ? 'selected' : '' %>>Visibles</option>
+    <option value="masques" <%= statut === 'masques' ? 'selected' : '' %>>Masqués</option>
+    <option value="vedette" <%= statut === 'vedette' ? 'selected' : '' %>>Mis en avant</option>
+  </select>
+  <button class="btn btn-dark btn-sm" type="submit">Filtrer</button>
+</form>
+
+<% if (!items.length) { %>
+  <div class="a-card a-empty"><p>Aucun produit trouvé.</p><a href="/admin/produits/nouveau" class="btn btn-dark">+ Ajouter un produit</a></div>
+<% } else { %>
+<div class="plist">
+  <% items.forEach(p => { const back = currentPath + (Object.keys(query).length ? '?' + new URLSearchParams(query).toString() : ''); %>
+  <article class="prow <%= p.is_visible ? '' : 'is-hidden' %>">
+    <a href="/admin/produits/<%= p.id %>" class="prow-img"><img src="<%= p.main_image ? p.main_image.thumb_url : '/img/placeholder.svg' %>" alt="" loading="lazy"></a>
+    <div class="prow-info">
+      <a href="/admin/produits/<%= p.id %>" class="prow-name"><%= p.name %></a>
+      <div class="prow-meta">
+        <strong><%= h.formatPrice(p.price) %></strong> · <%= p.reference %> · <%= p.category_name || 'Sans catégorie' %> · <%= p.images.length %> photo(s)
+      </div>
+      <div class="tags">
+        <span class="tag <%= p.is_visible ? 'tag-on' : 'tag-off' %>"><%= p.is_visible ? 'Visible' : 'Masqué' %></span>
+        <% if (p.is_featured) { %><span class="tag tag-star">★ En avant</span><% } %>
+        <% if (p.is_popular) { %><span class="tag tag-star">🔥 Populaire</span><% } %>
+        <% if (!p.in_stock) { %><span class="tag tag-off">Rupture</span><% } %>
+      </div>
+    </div>
+    <div class="prow-actions">
+      <a href="/admin/produits/<%= p.id %>" class="btn btn-dark btn-sm">Modifier</a>
+      <form method="post" action="/admin/produits/<%= p.id %>/basculer">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>"><input type="hidden" name="champ" value="visible"><input type="hidden" name="retour" value="<%= back %>">
+        <button class="btn btn-ghost btn-sm" type="submit"><%= p.is_visible ? 'Masquer' : 'Afficher' %></button>
+      </form>
+      <form method="post" action="/admin/produits/<%= p.id %>/basculer">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>"><input type="hidden" name="champ" value="vedette"><input type="hidden" name="retour" value="<%= back %>">
+        <button class="btn btn-ghost btn-sm" type="submit"><%= p.is_featured ? '☆ Retirer de la une' : '★ Mettre en avant' %></button>
+      </form>
+      <a href="/produit/<%= p.slug %>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir ↗</a>
+      <form method="post" action="/admin/produits/<%= p.id %>/supprimer" data-confirm="Supprimer définitivement « <%= p.name %> » et ses photos ?">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+      </form>
+    </div>
+  </article>
+  <% }) %>
+</div>
+<% } %>
+<%- include('_bottom') %>

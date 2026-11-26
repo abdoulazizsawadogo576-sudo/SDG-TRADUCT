@@ -1,0 +1,58 @@
+<%- include('_top') %>
+<div class="a-head"><div><h1>Paramètres de la boutique</h1><p class="muted">Nom, logo, bannière d'accueil, numéro WhatsApp et réseaux sociaux.</p></div></div>
+<form method="post" action="/admin/parametres" enctype="multipart/form-data" class="settings-form" data-product-form>
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <section class="a-card">
+    <h2>Identité</h2>
+    <div class="field-row">
+      <label class="field"><span>Nom de la boutique *</span><input name="shop_name" value="<%= settings.shop_name %>" required maxlength="60"></label>
+      <label class="field"><span>Ville / localisation</span><input name="city" value="<%= settings.city %>" maxlength="80"></label>
+    </div>
+    <label class="field"><span>Slogan</span><input name="tagline" value="<%= settings.tagline %>" maxlength="140"></label>
+    <div class="field-row">
+      <div class="field">
+        <span>Logo (carré de préférence)</span>
+        <% if (settings.logo_url) { %>
+          <div class="setting-img"><img src="<%= settings.logo_url %>" alt="Logo actuel" class="logo-prev"><label class="small"><input type="checkbox" name="remove_logo" value="1"> Retirer le logo</label></div>
+        <% } %>
+        <input type="file" name="logo" accept="image/*" data-single-image>
+      </div>
+      <div class="field">
+        <span>Image de la bannière d'accueil</span>
+        <% if (settings.banner_image) { %>
+          <div class="setting-img"><img src="<%= settings.banner_image %>" alt="Bannière actuelle" class="banner-prev"><label class="small"><input type="checkbox" name="remove_banner" value="1"> Retirer l'image</label></div>
+        <% } %>
+        <input type="file" name="banner" accept="image/*" data-single-image>
+      </div>
+    </div>
+  </section>
+
+  <section class="a-card">
+    <h2>Bannière d'accueil</h2>
+    <label class="field"><span>Titre</span><input name="banner_title" value="<%= settings.banner_title %>" maxlength="140"></label>
+    <label class="field"><span>Sous-titre</span><textarea name="banner_subtitle" rows="3" maxlength="400"><%= settings.banner_subtitle %></textarea></label>
+    <label class="field"><span>Texte livraison (barre du haut)</span><input name="delivery_text" value="<%= settings.delivery_text %>" maxlength="160"></label>
+  </section>
+
+  <section class="a-card">
+    <h2>Commandes WhatsApp</h2>
+    <label class="field"><span>Numéro WhatsApp qui reçoit les commandes *</span><input name="whatsapp_number" value="+<%= h.cleanPhone(settings.whatsapp_number) %>" required inputmode="tel" placeholder="+226 54 23 18 47"></label>
+    <p class="muted small">Format international avec l'indicatif du pays (+226 pour le Burkina Faso). Actuel : <strong><%= h.displayPhone(settings.whatsapp_number) %></strong> — <a class="link" href="<%= waGeneral %>" target="_blank" rel="noopener">tester le lien ↗</a></p>
+  </section>
+
+  <section class="a-card">
+    <h2>Réseaux sociaux</h2>
+    <p class="muted small">Collez l'adresse de vos pages. Seuls les réseaux renseignés apparaissent sur le site.</p>
+    <div class="field-row">
+      <label class="field"><span>Facebook</span><input name="facebook_url" value="<%= settings.facebook_url %>" placeholder="https://facebook.com/votrepage" inputmode="url"></label>
+      <label class="field"><span>Instagram</span><input name="instagram_url" value="<%= settings.instagram_url %>" placeholder="https://instagram.com/votrecompte" inputmode="url"></label>
+    </div>
+    <div class="field-row">
+      <label class="field"><span>TikTok</span><input name="tiktok_url" value="<%= settings.tiktok_url %>" placeholder="https://tiktok.com/@votrecompte" inputmode="url"></label>
+      <label class="field"><span>YouTube</span><input name="youtube_url" value="<%= settings.youtube_url %>" placeholder="https://youtube.com/@votrechaine" inputmode="url"></label>
+    </div>
+  </section>
+  <div class="sticky-save"><button class="btn btn-dark btn-lg" type="submit" data-submit>Enregistrer les paramètres</button></div>
+</form>
+<div class="uploading" data-uploading hidden><div class="spinner"></div><p>Enregistrement…</p></div>
+<%- include('_bottom') %>

@@ -1,0 +1,84 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="hero <%= settings.banner_image ? 'has-image' : '' %>">
+    <% if (settings.banner_image) { %><img src="<%= settings.banner_image %>" alt="" class="hero-bg" fetchpriority="high"><% } %>
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span> Commande directe sur WhatsApp</span>
+        <h1 class="hero-title"><%= settings.banner_title %></h1>
+        <p class="hero-sub"><%= settings.banner_subtitle %></p>
+        <div class="hero-ctas">
+          <a href="/catalogue" class="btn btn-light btn-lg">Découvrir le catalogue <svg class="ic"><use href="#i-arrow"/></svg></a>
+          <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa btn-lg"><svg class="ic"><use href="#i-whatsapp"/></svg> Commander sur WhatsApp</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong data-count="<%= total %>"><%= total %></strong><span>produit<%= total > 1 ? 's' : '' %> disponible<%= total > 1 ? 's' : '' %></span></div>
+          <div><strong data-count="<%= categories.length %>"><%= categories.length %></strong><span>catégories</span></div>
+          <div><strong>24h/7</strong><span>commande WhatsApp</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="perks container">
+    <div class="perk"><svg class="ic"><use href="#i-chat"/></svg><div><strong>Commande en 1 clic</strong><span>Message WhatsApp prérempli</span></div></div>
+    <div class="perk"><svg class="ic"><use href="#i-truck"/></svg><div><strong>Livraison</strong><span><%= settings.delivery_text %></span></div></div>
+    <div class="perk"><svg class="ic"><use href="#i-shield"/></svg><div><strong>Conseil personnalisé</strong><span>Un vendeur répond à vos questions</span></div></div>
+  </section>
+
+  <% if (categories.length) { %>
+  <section class="section container">
+    <div class="section-head">
+      <div><h2 class="section-title">Nos catégories</h2><p class="section-sub">Trouvez rapidement ce qu'il vous faut</p></div>
+      <a href="/catalogue" class="link-more">Tout voir <svg class="ic"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="cat-grid">
+      <% categories.forEach(c => { %>
+        <a href="/catalogue?categorie=<%= c.slug %>" class="cat-card reveal">
+          <span class="cat-icon" aria-hidden="true"><%= c.icon || '🛍️' %></span>
+          <span class="cat-name"><%= c.name %></span>
+          <span class="cat-count"><%= c.visible_count %> article<%= c.visible_count > 1 ? 's' : '' %></span>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+  <% } %>
+
+  <% if (!total) { %>
+    <section class="section container">
+      <div class="empty">
+        <span class="empty-icon">🛍️</span>
+        <h2>Notre catalogue arrive très bientôt</h2>
+        <p>Écrivez-nous dès maintenant sur WhatsApp pour connaître nos produits disponibles.</p>
+        <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa"><svg class="ic"><use href="#i-whatsapp"/></svg> Nous écrire</a>
+      </div>
+    </section>
+  <% } %>
+
+  <% [['En vedette', 'Notre sélection du moment', featured, '/catalogue'],
+      ['Nouveautés', 'Les derniers articles arrivés en boutique', latest, '/catalogue?tri=recent'],
+      ['Produits populaires', 'Les articles préférés de nos clients', popular, '/catalogue?tri=populaire']].forEach(([t, sub, list, link]) => {
+     if (!list.length) return; %>
+  <section class="section container">
+    <div class="section-head">
+      <div><h2 class="section-title"><%= t %></h2><p class="section-sub"><%= sub %></p></div>
+      <a href="<%= link %>" class="link-more">Voir tout <svg class="ic"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="grid">
+      <% list.forEach(p => { %><%- include('partials/product-card', { p }) %><% }) %>
+    </div>
+  </section>
+  <% }) %>
+
+  <section class="container">
+    <div class="cta-band">
+      <div>
+        <h2>Vous cherchez un article précis ?</h2>
+        <p>Envoyez-nous un message : nous vous trouvons le bon produit au meilleur prix.</p>
+      </div>
+      <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa btn-lg"><svg class="ic"><use href="#i-whatsapp"/></svg> Discuter sur WhatsApp</a>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

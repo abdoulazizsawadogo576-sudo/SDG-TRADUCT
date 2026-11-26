@@ -1,0 +1,42 @@
+<div class="topbar">
+  <div class="container topbar-inner">
+    <span><svg class="ic"><use href="#i-truck"/></svg> <%= settings.delivery_text %></span>
+    <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="topbar-wa"><svg class="ic"><use href="#i-whatsapp"/></svg> <%= h.displayPhone(settings.whatsapp_number) %></a>
+  </div>
+</div>
+<header class="site-header" id="top">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Accueil <%= settings.shop_name %>">
+      <% if (settings.logo_url) { %>
+        <img src="<%= settings.logo_url %>" alt="" class="brand-logo" width="40" height="40">
+      <% } else { %>
+        <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span>
+      <% } %>
+      <span class="brand-text">
+        <span class="brand-name"><%= settings.shop_name %></span>
+        <span class="brand-tag"><%= settings.city %></span>
+      </span>
+    </a>
+
+    <form class="search" action="/catalogue" method="get" role="search" data-search>
+      <svg class="ic search-ic"><use href="#i-search"/></svg>
+      <input type="search" name="q" placeholder="Rechercher un produit…" autocomplete="off" aria-label="Rechercher un produit"
+             value="<%= typeof q !== 'undefined' ? q : '' %>" data-search-input>
+      <button type="submit" class="search-btn">Rechercher</button>
+      <div class="search-results" data-search-results hidden></div>
+    </form>
+
+    <nav class="header-nav">
+      <a href="/catalogue" class="nav-link <%= currentPath === '/catalogue' ? 'active' : '' %>"><svg class="ic"><use href="#i-grid"/></svg><span>Catalogue</span></a>
+      <a href="<%= waGeneral %>" target="_blank" rel="noopener" class="btn btn-wa btn-sm header-wa"><svg class="ic"><use href="#i-whatsapp"/></svg><span>Nous écrire</span></a>
+    </nav>
+  </div>
+  <div class="cat-strip">
+    <div class="container cat-strip-inner">
+      <a href="/catalogue" class="chip <%= currentPath === '/catalogue' && !query.categorie ? 'active' : '' %>">Tout</a>
+      <% navCategories().forEach(c => { %>
+        <a href="/catalogue?categorie=<%= c.slug %>" class="chip <%= query.categorie === c.slug ? 'active' : '' %>"><% if (c.icon) { %><span aria-hidden="true"><%= c.icon %></span> <% } %><%= c.name %></a>
+      <% }) %>
+    </div>
+  </div>
+</header>

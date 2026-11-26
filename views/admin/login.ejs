@@ -1,0 +1,25 @@
+<%- include('../partials/head', { bodyClass: 'admin admin-login' }) %>
+<main class="login-wrap">
+  <form method="post" action="/admin/connexion" class="login-card">
+    <a href="/" class="brand">
+      <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span>
+      <span class="brand-text"><span class="brand-name"><%= settings.shop_name %></span><span class="brand-tag">Espace administrateur</span></span>
+    </a>
+    <h1>Connexion</h1>
+    <p class="muted">Accès réservé au gérant de la boutique.</p>
+    <% if (noAdmin) { %>
+      <div class="alert alert-error">Aucun compte administrateur n'existe encore. Définissez <code>ADMIN_USERNAME</code> et <code>ADMIN_PASSWORD</code> dans la configuration du serveur puis redémarrez-le (voir le guide).</div>
+    <% } %>
+    <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label class="field"><span>Identifiant</span><input name="username" value="<%= username %>" autocomplete="username" autocapitalize="none" required autofocus></label>
+    <label class="field"><span>Mot de passe</span>
+      <span class="pwd"><input name="password" type="password" autocomplete="current-password" required data-pwd><button type="button" class="pwd-toggle" data-pwd-toggle>Afficher</button></span>
+    </label>
+    <button type="submit" class="btn btn-dark btn-lg btn-block">Se connecter</button>
+    <a href="/" class="back-link">← Retour à la boutique</a>
+  </form>
+</main>
+<div class="toast" data-toast></div>
+</body>
+</html>

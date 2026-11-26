@@ -1,0 +1,27 @@
+<%- include('../partials/head', { bodyClass: 'admin' }) %>
+<header class="a-header">
+  <div class="a-header-inner">
+    <a href="/admin" class="brand">
+      <span class="brand-mark" aria-hidden="true"><%= settings.shop_name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() %></span>
+      <span class="brand-text"><span class="brand-name"><%= settings.shop_name %></span><span class="brand-tag">Espace administrateur</span></span>
+    </a>
+    <div class="a-header-actions">
+      <a href="/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir le site ↗</a>
+      <form method="post" action="/admin/deconnexion">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <button class="btn btn-ghost btn-sm" type="submit">Déconnexion</button>
+      </form>
+    </div>
+  </div>
+  <nav class="a-nav">
+    <% [['/admin', 'Tableau de bord'], ['/admin/produits', 'Produits'], ['/admin/produits/nouveau', '+ Ajouter un produit'], ['/admin/categories', 'Catégories'], ['/admin/parametres', 'Paramètres'], ['/admin/compte', 'Mon compte']].forEach(([href, label]) => {
+       const active = currentPath === href || (href === '/admin/produits' && currentPath.startsWith('/admin/produits/') && currentPath !== '/admin/produits/nouveau'); %>
+      <a href="<%= href %>" class="a-nav-link <%= active ? 'active' : '' %> <%= href.endsWith('nouveau') ? 'a-nav-cta' : '' %>"><%= label %></a>
+    <% }) %>
+  </nav>
+</header>
+<main class="a-main">
+  <% if (flash) { %><div class="alert alert-<%= flash.type %>" role="status"><%= flash.msg %></div><% } %>
+  <% if (typeof errors !== 'undefined' && errors.length) { %>
+    <div class="alert alert-error" role="alert"><strong>Veuillez corriger :</strong><ul><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul></div>
+  <% } %>

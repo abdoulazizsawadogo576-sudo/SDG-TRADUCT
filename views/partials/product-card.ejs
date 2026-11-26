@@ -1,0 +1,29 @@
+<% const isNew = (Date.now() - new Date(p.created_at.replace(' ', 'T') + 'Z').getTime()) < 14 * 86400e3;
+   const discount = p.old_price && p.old_price > p.price ? Math.round((1 - p.price / p.old_price) * 100) : 0; %>
+<article class="card reveal">
+  <a href="<%= p.url %>" class="card-media" aria-label="Voir <%= p.name %>">
+    <% if (p.main_image) { %>
+      <img src="<%= p.main_image.thumb_url %>" alt="<%= p.name %>" loading="lazy" decoding="async" width="600" height="600" class="card-img">
+      <% if (p.second_image) { %><img src="<%= p.second_image.thumb_url %>" alt="" loading="lazy" decoding="async" width="600" height="600" class="card-img card-img-alt"><% } %>
+    <% } else { %>
+      <img src="/img/placeholder.svg" alt="" class="card-img" width="600" height="600">
+    <% } %>
+    <span class="badges">
+      <% if (!p.in_stock) { %><span class="badge badge-dark">Rupture</span><% } else if (discount) { %><span class="badge badge-sale">-<%= discount %>%</span><% } %>
+      <% if (isNew && p.in_stock) { %><span class="badge badge-new">Nouveau</span><% } %>
+    </span>
+  </a>
+  <div class="card-body">
+    <% if (p.category_name) { %><span class="card-cat"><%= p.category_name %></span><% } %>
+    <h3 class="card-title"><a href="<%= p.url %>"><%= p.name %></a></h3>
+    <div class="price-row">
+      <span class="price"><%= h.formatPrice(p.price) %></span>
+      <% if (discount) { %><span class="old-price"><%= h.formatPrice(p.old_price) %></span><% } %>
+    </div>
+    <div class="card-actions">
+      <a href="<%= p.url %>" class="btn btn-dark btn-sm btn-block">Voir le produit</a>
+      <a href="<%= p.whatsapp_url %>" target="_blank" rel="noopener" class="btn btn-wa btn-sm btn-icon" data-order-id="<%= p.id %>"
+         aria-label="Commander <%= p.name %> sur WhatsApp" title="Commander sur WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,40 @@
+<%- include('_top') %>
+<div class="a-head"><div><h1>Catégories</h1><p class="muted">Créez autant de catégories que nécessaire. L'ordre définit l'affichage sur le site.</p></div></div>
+
+<section class="a-card">
+  <h2>Nouvelle catégorie</h2>
+  <form method="post" action="/admin/categories" class="cat-form">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label class="field field-icon"><span>Icône</span><input name="icon" maxlength="8" placeholder="📦"></label>
+    <label class="field field-grow"><span>Nom *</span><input name="name" required maxlength="80" placeholder="Ex : Accessoires auto"></label>
+    <label class="field field-pos"><span>Ordre</span><input name="position" inputmode="numeric" placeholder="<%= categories.length %>"></label>
+    <button class="btn btn-dark" type="submit">Créer</button>
+  </form>
+  <p class="muted small">Astuce : pour l'icône, utilisez un émoji depuis le clavier de votre téléphone (📱 ⌚ 👟 🏠 …).</p>
+</section>
+
+<section class="a-card">
+  <h2>Catégories existantes (<%= categories.length %>)</h2>
+  <% if (!categories.length) { %><p class="muted">Aucune catégorie.</p><% } %>
+  <div class="cat-list">
+    <% categories.forEach(c => { %>
+      <div class="cat-row">
+        <form method="post" action="/admin/categories/<%= c.id %>" class="cat-form">
+          <input type="hidden" name="_csrf" value="<%= csrf() %>">
+          <label class="field field-icon"><span>Icône</span><input name="icon" value="<%= c.icon %>" maxlength="8"></label>
+          <label class="field field-grow"><span>Nom</span><input name="name" value="<%= c.name %>" required maxlength="80"></label>
+          <label class="field field-pos"><span>Ordre</span><input name="position" value="<%= c.position %>" inputmode="numeric"></label>
+          <button class="btn btn-dark btn-sm" type="submit">Enregistrer</button>
+        </form>
+        <div class="cat-row-foot">
+          <span class="muted small"><%= c.total_count %> produit(s) · <a class="link" href="/catalogue?categorie=<%= c.slug %>" target="_blank" rel="noopener">voir ↗</a> · <a class="link" href="/admin/produits/nouveau?categorie=<%= c.id %>">+ ajouter un produit</a></span>
+          <form method="post" action="/admin/categories/<%= c.id %>/supprimer" data-confirm="Supprimer la catégorie « <%= c.name %> » ? Ses <%= c.total_count %> produit(s) seront conservés sans catégorie.">
+            <input type="hidden" name="_csrf" value="<%= csrf() %>">
+            <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+<%- include('_bottom') %>

@@ -1,0 +1,14 @@
+<%- include('_top') %>
+<div class="a-head"><div><h1>Mon compte</h1><p class="muted">Modifiez votre identifiant et votre mot de passe.</p></div></div>
+<section class="a-card narrow">
+  <form method="post" action="/admin/compte">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label class="field"><span>Identifiant</span><input name="username" value="<%= admin.username %>" required minlength="3" autocomplete="username" autocapitalize="none"></label>
+    <label class="field"><span>Nouveau mot de passe <em>laisser vide pour ne pas changer</em></span><input name="new_password" type="password" minlength="8" autocomplete="new-password"></label>
+    <label class="field"><span>Confirmer le nouveau mot de passe</span><input name="confirm_password" type="password" autocomplete="new-password"></label>
+    <hr>
+    <label class="field"><span>Mot de passe actuel * <em>pour confirmer</em></span><input name="current_password" type="password" required autocomplete="current-password"></label>
+    <button class="btn btn-dark btn-lg" type="submit">Mettre à jour</button>
+  </form>
+</section>
+<%- include('_bottom') %>

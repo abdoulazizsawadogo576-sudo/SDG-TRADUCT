@@ -1,0 +1,61 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main class="container page">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="/">Accueil</a><span>/</span><% if (category || q) { %><a href="/catalogue">Catalogue</a><span>/</span><span><%= category ? category.name : 'Recherche' %></span><% } else { %><span>Catalogue</span><% } %></nav>
+
+  <div class="catalogue-head">
+    <div>
+      <h1 class="page-title"><%= title %></h1>
+      <p class="counter" data-product-counter><strong><%= total %></strong> produit<%= total > 1 ? 's' : '' %> <%= q || category ? 'trouvé' + (total > 1 ? 's' : '') : 'disponible' + (total > 1 ? 's' : '') %></p>
+    </div>
+    <form method="get" action="/catalogue" class="filters" data-autosubmit>
+      <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+      <label class="select">
+        <span class="sr-only">Catégorie</span>
+        <select name="categorie">
+          <option value="">Toutes les catégories</option>
+          <% categories.forEach(c => { %><option value="<%= c.slug %>" <%= category && category.id === c.id ? 'selected' : '' %>><%= c.name %> (<%= c.visible_count %>)</option><% }) %>
+        </select>
+      </label>
+      <label class="select">
+        <span class="sr-only">Trier par</span>
+        <select name="tri">
+          <option value="recent" <%= sort === 'recent' ? 'selected' : '' %>>Plus récents</option>
+          <option value="populaire" <%= sort === 'populaire' ? 'selected' : '' %>>Populaires</option>
+          <option value="prix_asc" <%= sort === 'prix_asc' ? 'selected' : '' %>>Prix croissant</option>
+          <option value="prix_desc" <%= sort === 'prix_desc' ? 'selected' : '' %>>Prix décroissant</option>
+          <option value="nom" <%= sort === 'nom' ? 'selected' : '' %>>Nom (A → Z)</option>
+        </select>
+      </label>
+      <noscript><button class="btn btn-dark btn-sm" type="submit">Filtrer</button></noscript>
+    </form>
+  </div>
+
+  <% if (q) { %>
+    <p class="active-filter">Résultats pour « <strong><%= q %></strong> » <a href="<%= buildUrl({ q: '' }) %>" class="chip chip-x">Effacer <svg class="ic"><use href="#i-x-close"/></svg></a></p>
+  <% } %>
+
+  <% if (items.length) { %>
+    <div class="grid">
+      <% items.forEach(p => { %><%- include('partials/product-card', { p }) %><% }) %>
+    </div>
+    <% if (pages > 1) { %>
+      <nav class="pagination" aria-label="Pagination">
+        <% if (page > 1) { %><a href="<%= buildUrl({ page: page - 1 }) %>" class="btn btn-ghost btn-sm"><svg class="ic"><use href="#i-chev-l"/></svg> Précédent</a><% } %>
+        <span>Page <%= page %> sur <%= pages %></span>
+        <% if (page < pages) { %><a href="<%= buildUrl({ page: page + 1 }) %>" class="btn btn-ghost btn-sm">Suivant <svg class="ic"><use href="#i-chev-r"/></svg></a><% } %>
+      </nav>
+    <% } %>
+  <% } else { %>
+    <div class="empty">
+      <span class="empty-icon">🔍</span>
+      <h2>Aucun produit trouvé</h2>
+      <p>Essayez un autre mot-clé ou une autre catégorie. Vous pouvez aussi nous demander directement sur WhatsApp.</p>
+      <div class="empty-actions">
+        <a href="/catalogue" class="btn btn-ghost">Voir tout le catalogue</a>
+        <a href="<%= h.whatsappLink(settings.whatsapp_number, `Bonjour, je recherche : ${q || (category ? category.name : '')}. L'avez-vous en stock ?`) %>" target="_blank" rel="noopener" class="btn btn-wa"><svg class="ic"><use href="#i-whatsapp"/></svg> Demander sur WhatsApp</a>
+      </div>
+    </div>
+  <% } %>
+</main>
+<%- include('partials/footer') %>

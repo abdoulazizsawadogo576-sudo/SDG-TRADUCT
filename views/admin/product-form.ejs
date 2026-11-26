@@ -1,0 +1,100 @@
+<%- include('_top') %>
+<div class="a-head">
+  <div>
+    <a href="/admin/produits" class="link small">← Retour aux produits</a>
+    <h1><%= isNew ? 'Ajouter un produit' : 'Modifier le produit' %></h1>
+    <% if (!isNew) { %><p class="muted"><%= product.name %> · <a class="link" href="/produit/<%= product.slug %>" target="_blank" rel="noopener">voir la fiche en ligne ↗</a></p><% } %>
+  </div>
+</div>
+
+<form method="post" action="<%= isNew ? '/admin/produits' : '/admin/produits/' + product.id %>" enctype="multipart/form-data" class="pform" data-product-form>
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <input type="hidden" name="image_order" value="<%= product.images.map(i => i.id).join(',') %>" data-image-order>
+
+  <div class="pform-main">
+    <section class="a-card">
+      <h2>Photos du produit</h2>
+      <p class="muted small">La <strong>première photo</strong> est la photo principale. Vous pouvez ajouter jusqu'à <%= maxImages %> photos (JPG, PNG, WebP). Elles sont automatiquement optimisées.</p>
+      <% if (product.images.length) { %>
+        <div class="img-grid" data-image-grid>
+          <% product.images.forEach((im, i) => { %>
+            <div class="img-item" data-image-id="<%= im.id %>">
+              <img src="<%= im.thumb_url %>" alt="">
+              <span class="img-main-badge">Principale</span>
+              <div class="img-tools">
+                <button type="button" class="img-btn" data-move="-1" aria-label="Déplacer vers la gauche">◀</button>
+                <button type="button" class="img-btn" data-make-main aria-label="Définir comme photo principale">★</button>
+                <button type="button" class="img-btn" data-move="1" aria-label="Déplacer vers la droite">▶</button>
+              </div>
+              <label class="img-del"><input type="checkbox" name="delete_images" value="<%= im.id %>" data-delete-image> Supprimer</label>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+      <label class="dropzone" data-dropzone>
+        <input type="file" name="images" accept="image/*" multiple data-image-input>
+        <span class="dz-icon">📷</span>
+        <strong>Ajouter des photos</strong>
+        <span class="muted small">Touchez ici pour choisir dans la galerie de votre téléphone ou prendre une photo</span>
+      </label>
+      <div class="img-grid img-grid-new" data-image-preview></div>
+    </section>
+
+    <section class="a-card">
+      <h2>Informations</h2>
+      <label class="field"><span>Nom du produit *</span><input name="name" value="<%= values.name %>" required maxlength="150" placeholder="Ex : Montre connectée Ultra Series 9"></label>
+      <div class="field-row">
+        <label class="field"><span>Prix (FCFA) *</span><input name="price" value="<%= values.price %>" required inputmode="numeric" placeholder="Ex : 25000" data-price></label>
+        <label class="field"><span>Ancien prix (FCFA) <em>facultatif</em></span><input name="old_price" value="<%= values.old_price || '' %>" inputmode="numeric" placeholder="Prix barré si promotion" data-price></label>
+      </div>
+      <p class="muted small price-preview" data-price-preview></p>
+      <div class="field-row">
+        <label class="field"><span>Catégorie</span>
+          <select name="category_id">
+            <option value="">— Sans catégorie —</option>
+            <% categories.forEach(c => { %><option value="<%= c.id %>" <%= String(values.category_id) === String(c.id) ? 'selected' : '' %>><%= c.icon %> <%= c.name %></option><% }) %>
+          </select>
+          <a href="/admin/categories" class="link small">Créer / modifier les catégories</a>
+        </label>
+        <label class="field"><span>Référence</span><input name="reference" value="<%= values.reference %>" maxlength="40" placeholder="Générée automatiquement"></label>
+      </div>
+      <label class="field"><span>Résumé court <em>facultatif</em></span><input name="short_description" value="<%= values.short_description %>" maxlength="300" placeholder="Une phrase d'accroche affichée près du prix"></label>
+      <label class="field"><span>Description détaillée</span><textarea name="description" rows="7" placeholder="Décrivez le produit : utilisation, points forts, contenu de la boîte, garantie…"><%= values.description %></textarea></label>
+      <label class="field"><span>Caractéristiques <em>une par ligne, au format « Nom : Valeur »</em></span>
+        <textarea name="specs" rows="6" placeholder="Écran : AMOLED 1,96 pouce&#10;Autonomie : 7 jours&#10;Étanchéité : IP68&#10;Couleurs : Noir, Argent"><%= values.specs %></textarea>
+      </label>
+    </section>
+  </div>
+
+  <aside class="pform-side">
+    <section class="a-card">
+      <h2>Affichage</h2>
+      <label class="switch"><input type="checkbox" name="is_visible" value="1" <%= values.is_visible ? 'checked' : '' %>><span class="sw"></span><span><strong>Visible sur le site</strong><small>Décochez pour masquer temporairement</small></span></label>
+      <label class="switch"><input type="checkbox" name="is_featured" value="1" <%= values.is_featured ? 'checked' : '' %>><span class="sw"></span><span><strong>Mettre en avant</strong><small>Section « En vedette » de l'accueil</small></span></label>
+      <label class="switch"><input type="checkbox" name="is_popular" value="1" <%= values.is_popular ? 'checked' : '' %>><span class="sw"></span><span><strong>Produit populaire</strong><small>Toujours en tête des « Populaires »</small></span></label>
+      <label class="switch"><input type="checkbox" name="in_stock" value="1" <%= values.in_stock ? 'checked' : '' %>><span class="sw"></span><span><strong>En stock</strong><small>Sinon : affiché « Rupture »</small></span></label>
+    </section>
+    <div class="pform-submit">
+      <button type="submit" class="btn btn-dark btn-lg btn-block" data-submit><%= isNew ? 'Enregistrer le produit' : 'Enregistrer les modifications' %></button>
+      <a href="/admin/produits" class="btn btn-ghost btn-block">Annuler</a>
+    </div>
+    <% if (!isNew) { %>
+      <section class="a-card">
+        <h2>Statistiques</h2>
+        <p class="small"><strong><%= product.views %></strong> vue(s) · <strong><%= product.order_clicks %></strong> clic(s) « Commander »</p>
+        <p class="small muted">Créé le <%= new Date(product.created_at.replace(' ', 'T') + 'Z').toLocaleDateString('fr-FR') %></p>
+      </section>
+    <% } %>
+  </aside>
+</form>
+
+<% if (!isNew) { %>
+  <form method="post" action="/admin/produits/<%= product.id %>/supprimer" class="danger-zone" data-confirm="Supprimer définitivement « <%= product.name %> » et toutes ses photos ? Cette action est irréversible.">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <div><strong>Supprimer ce produit</strong><p class="muted small">Le produit et ses photos seront supprimés définitivement. Pour le retirer temporairement, décochez plutôt « Visible sur le site ».</p></div>
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+  </form>
+<% } %>
+
+<div class="uploading" data-uploading hidden><div class="spinner"></div><p>Enregistrement et envoi des photos…<br><small>Ne fermez pas la page.</small></p></div>
+<%- include('_bottom') %>
